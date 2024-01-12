@@ -19,6 +19,7 @@ qt_add_executable(books
     bookwindow.cpp bookwindow.h bookwindow.ui
     initdb.h
     main.cpp
+
 )
 
 set_target_properties(books PROPERTIES

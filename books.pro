@@ -1,3 +1,5 @@
+DESTDIR = $$OUT_PWD/build
+
 TEMPLATE = app
 INCLUDEPATH += .
 
@@ -9,5 +11,7 @@ FORMS       = bookwindow.ui
 QT += sql widgets widgets
 requires(qtConfig(tableview))
 
-target.path = $$[QT_INSTALL_EXAMPLES]/sql/books
+LIBS += -lurlmon
+
+target.path = $$PWD
 INSTALLS += target

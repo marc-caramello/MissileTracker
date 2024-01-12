@@ -93,6 +93,15 @@ BookWindow::BookWindow()
     createMenuBar();
 }
 
+/*
+void BookWindow::downloadExcelFile()
+{
+    LPCTSTR url = TEXT("https://www.nti.org/wp-content/uploads/2021/10/north_korea_missile_test_database.xlsx");
+    LPCTSTR destination = TEXT("D:\\temp\\excel.xlsx");
+    HRESULT hr = URLDownloadToFile(NULL, url, destination, 0, NULL);
+}
+*/
+
 void BookWindow::showError(const QSqlError &err)
 {
     QMessageBox::critical(this, "Unable to initialize Database",
