@@ -9,6 +9,7 @@
 
 BookWindow::BookWindow()
 {
+    downloadExcelFile();
     ui.setupUi(this);
 
     if (!QSqlDatabase::drivers().contains("QSQLITE"))
@@ -93,14 +94,32 @@ BookWindow::BookWindow()
     createMenuBar();
 }
 
-/*
 void BookWindow::downloadExcelFile()
 {
-    LPCTSTR url = TEXT("https://www.nti.org/wp-content/uploads/2021/10/north_korea_missile_test_database.xlsx");
-    LPCTSTR destination = TEXT("D:\\temp\\excel.xlsx");
+    const wchar_t* url = L"https://www.nti.org/wp-content/uploads/2021/10/north_korea_missile_test_database.xlsx";
+    const wchar_t* destination = getDestination();
     HRESULT hr = URLDownloadToFile(NULL, url, destination, 0, NULL);
 }
-*/
+
+wchar_t* BookWindow::getDestination() {
+    // Get the size of the buffer needed for the current working directory
+    DWORD buffer_size = GetCurrentDirectory(0, nullptr);
+
+    // Allocate a buffer to store the current working directory
+    wchar_t* destination = new wchar_t[buffer_size];
+
+    // Get the current working directory and store it in the buffer
+    GetCurrentDirectory(buffer_size, destination);
+
+    // Go back 1 folder
+    PathRemoveFileSpec(destination);
+
+    // Append "\\temp\\excel.xlsx"
+    PathAppend(destination, L"temp");
+    PathAppend(destination, L"excel.xlsx");
+
+    return destination;
+}
 
 void BookWindow::showError(const QSqlError &err)
 {

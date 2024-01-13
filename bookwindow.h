@@ -6,8 +6,11 @@
 
 #include <QtWidgets>
 #include <QtSql>
-#include <Windows.h>
-#include <Urlmon.h>
+#include <shlwapi.h>
+#include <urlmon.h>
+#include <windows.h>
+#include <wchar.h>
+
 #include "ui_bookwindow.h"
 
 #pragma comment(lib, "urlmon.lib")
@@ -23,6 +26,7 @@ private slots:
 
 private:
     void downloadExcelFile();
+    wchar_t* getDestination();
     void showError(const QSqlError &err);
     Ui::BookWindow ui;
     QSqlRelationalTableModel *model = nullptr;
