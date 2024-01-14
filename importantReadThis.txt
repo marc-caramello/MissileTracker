@@ -1,0 +1,3 @@
+I must run these commands in MSYS2 to install the necessary header files
+
+pacman -S mingw-w64-x86_64-xlnt

@@ -15,8 +15,8 @@ void BookDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
 {
     if (index.column() != 5) {
         QSqlRelationalDelegate::paint(painter, option, index);
-    } else {
-        const QAbstractItemModel *model = index.model();
+    }
+    else {
         QPalette::ColorGroup cg = (option.state & QStyle::State_Enabled) ?
             (option.state & QStyle::State_Active) ?
                         QPalette::Normal :
@@ -27,18 +27,7 @@ void BookDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
             painter->fillRect(
                         option.rect,
                         option.palette.color(cg, QPalette::Highlight));
-
-        int rating = model->data(index, Qt::DisplayRole).toInt();
-        int width = star.width();
-        int height = star.height();
-        int x = option.rect.x();
-        int y = option.rect.y() + (option.rect.height() / 2) - (height / 2);
-        for (int i = 0; i < rating; ++i) {
-            painter->drawPixmap(x, y, star);
-            x += width;
-        }
     }
-
     QPen pen = painter->pen();
     painter->setPen(option.palette.color(QPalette::Mid));
     painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());

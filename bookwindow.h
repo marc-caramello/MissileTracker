@@ -6,10 +6,15 @@
 
 #include <QtWidgets>
 #include <QtSql>
+#include <cstdlib>
+#include <cwchar>
 #include <shlwapi.h>
 #include <urlmon.h>
 #include <windows.h>
-#include <wchar.h>
+
+#include <xlsxio_read.h>
+#include <string>
+#include <vector>
 
 #include "ui_bookwindow.h"
 
@@ -25,8 +30,11 @@ private slots:
     void about();
 
 private:
-    void downloadExcelFile();
+    void download_and_simplify_ExcelFile();
     wchar_t* getDestination();
+    char* wideToNarrow(const wchar_t* wideStr);
+    void storeExcelFileData(const char* destination);
+
     void showError(const QSqlError &err);
     Ui::BookWindow ui;
     QSqlRelationalTableModel *model = nullptr;
