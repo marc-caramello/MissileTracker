@@ -6,25 +6,19 @@
 
 #include <QtWidgets>
 #include <QtSql>
-
-#include <chrono>
 #include <cstdlib>
-#include <ctime>
 #include <cwchar>
-#include <iomanip>
 #include <shlwapi.h>
-#include <sstream>
-#include <string>
 #include <urlmon.h>
-#include <vector>
 #include <windows.h>
+
 #include <xlsxio_read.h>
+#include <string>
+#include <vector>
 
 #include "ui_bookwindow.h"
 
 #pragma comment(lib, "urlmon.lib")
-
-using namespace std;
 
 class BookWindow: public QMainWindow
 {
@@ -36,27 +30,16 @@ private slots:
     void about();
 
 private:
-    vector<string> date;
-    vector<string> timeInUtc;
-    vector<string> startingLocation_city;
-    vector<string> startingLocation_latitude;
-    vector<string> startingLocation_longitude;
-    vector<string> landingLocation;
-    vector<string> distanceTraveled;
-
-    void downloadExcelFile_and_storeItsData();
+    void download_and_simplify_ExcelFile();
     wchar_t* getDestination();
     char* wideToNarrow(const wchar_t* wideStr);
     void storeExcelFileData(const char* destination);
-    bool isLeapYear(const int year);
-    int daysInMonth(const int year, const int month);
-    string convertDate(const char* excelDate);
-    string convertTime(const char* excelTime);
 
     void showError(const QSqlError &err);
     Ui::BookWindow ui;
     QSqlRelationalTableModel *model = nullptr;
     int authorIdx = 0, genreIdx = 0;
+
     void createMenuBar();
 };
 

@@ -9,7 +9,7 @@
 
 BookWindow::BookWindow()
 {
-    downloadExcelFile_and_storeItsData();
+    download_and_simplify_ExcelFile();
     ui.setupUi(this);
 
     if (!QSqlDatabase::drivers().contains("QSQLITE"))
@@ -94,7 +94,7 @@ BookWindow::BookWindow()
     createMenuBar();
 }
 
-void BookWindow::downloadExcelFile_and_storeItsData()
+void BookWindow::download_and_simplify_ExcelFile()
 {
     const wchar_t* url = L"https://www.nti.org/wp-content/uploads/2021/10/north_korea_missile_test_database.xlsx";
     const wchar_t* pathToExcelFile = getDestination();
@@ -152,96 +152,77 @@ char* BookWindow::wideToNarrow(const wchar_t* wideStr) {
 
 void BookWindow::storeExcelFileData(const char* pathToExcelFile)
 {
-    xlsxioreader xlsxioread = xlsxioread_open(pathToExcelFile);
-    xlsxioreadersheet sheet = xlsxioread_sheet_open(xlsxioread, NULL, XLSXIOREAD_SKIP_EMPTY_ROWS);
+    /*
+    // Open the .xlsx file
+    xlsxioreader xlsxioread;
+    if ((xlsxioread = xlsxioread_open(pathToExcelFile)) == NULL) {
+        throw std::runtime_error("Error opening .xlsx file");
+    }
+    // Define vectors to store data
+    std::vector<std::string> date;
+    std::vector<std::string> timeInUtc;
+    std::vector<std::string> startingLocation_city;
+    std::vector<std::string> startingLocation_latitude;
+    std::vector<std::string> startingLocation_longitude;
+    std::vector<std::string> landingLocation;
+    std::vector<std::string> distanceTraveled;
 
-    char* cellVal;
-    int current_rowNum = 0;
+    // Open the first sheet
+    xlsxioreadersheet sheet;
+    if ((sheet = xlsxioread_sheet_open(xlsxioread, NULL, XLSXIOREAD_SKIP_EMPTY_ROWS)) != NULL) {
+        char* cell_value;
+        size_t row_count = 0;
 
-    while (xlsxioread_sheet_next_row(sheet)) {
-        if (current_rowNum >= 148) {
-            for (char current_columnLetter = 'A'; current_columnLetter <= 'O'; current_columnLetter++) {
-                cellVal = xlsxioread_sheet_next_cell(sheet);
+        // Read each row
+        while (xlsxioread_sheet_next_row(sheet)) {
+            row_count++;
 
-                if (current_columnLetter == 'B') {
-                    date.push_back(convertDate(cellVal));
-                }
-                else if (current_columnLetter == 'D') {
-                    timeInUtc.push_back(convertTime(cellVal));
-                }
-                else if (current_columnLetter == 'I') {
-                    startingLocation_city.push_back(cellVal);
-                }
-                else if (current_columnLetter == 'K') {
-                    startingLocation_latitude.push_back(cellVal);
-                }
-                else if (current_columnLetter == 'L') {
-                    startingLocation_longitude.push_back(cellVal);
-                }
-                else if (current_columnLetter == 'M') {
-                    landingLocation.push_back(cellVal);
-                }
-                else if (current_columnLetter == 'O') {
-                    distanceTraveled.push_back(cellVal);
-                }
+            // Only process rows 148 to 260
+            if (row_count < 148) continue;
+            if (row_count > 260) break;
+
+            // Read each cell in the row
+            if ((cell_value = xlsxioread_sheet_next_cell(sheet)) != NULL) {
+                date.push_back(cell_value);
+                free(cell_value);
+            }
+            if ((cell_value = xlsxioread_sheet_next_cell(sheet)) != NULL) {
+                timeInUtc.push_back(cell_value);
+                free(cell_value);
+            }
+            // Skip columns E to H
+            for (int i = 0; i < 4; i++) xlsxioread_sheet_next_cell(sheet);
+
+            if ((cell_value = xlsxioread_sheet_next_cell(sheet)) != NULL) {
+                startingLocation_city.push_back(cell_value);
+                free(cell_value);
+            }
+            if ((cell_value = xlsxioread_sheet_next_cell(sheet)) != NULL) {
+                startingLocation_latitude.push_back(cell_value);
+                free(cell_value);
+            }
+            if ((cell_value = xlsxioread_sheet_next_cell(sheet)) != NULL) {
+                startingLocation_longitude.push_back(cell_value);
+                free(cell_value);
+            }
+            if ((cell_value = xlsxioread_sheet_next_cell(sheet)) != NULL) {
+                landingLocation.push_back(cell_value);
+                free(cell_value);
+            }
+            // Skip column N
+            xlsxioread_sheet_next_cell(sheet);
+
+            if ((cell_value = xlsxioread_sheet_next_cell(sheet)) != NULL) {
+                distanceTraveled.push_back(cell_value);
+                free(cell_value);
             }
         }
-        current_rowNum++;
+        // Close the sheet
+        xlsxioread_sheet_close(sheet);
     }
-    xlsxioread_sheet_close(sheet);
+    // Close the .xlsx reader
     xlsxioread_close(xlsxioread);
-}
-
-bool BookWindow::isLeapYear(const int year) {
-    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-}
-
-int BookWindow::daysInMonth(const int year, const int month) {
-    std::vector<int> monthLengths = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    if (month == 2 && isLeapYear(year)) {
-        return 29;
-    }
-    return monthLengths[month - 1];
-}
-
-string BookWindow::convertDate(const char* excelDate) {
-    int days = std::stoi(excelDate);
-    int year = 1900;
-    int month = 1;
-
-    while (days > 365) {
-        if (isLeapYear(year) && days == 366) {
-            break;
-        }
-        else if (isLeapYear(year)) {
-            days -= 366;
-        }
-        else {
-            days -= 365;
-        }
-        year++;
-    }
-    while (days > daysInMonth(year, month)) {
-        days -= daysInMonth(year, month);
-        month++;
-    }
-    char buffer[11];
-    snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d", year, month, days);
-    return std::string(buffer);
-}
-
-string BookWindow::convertTime(const char* excelTime) {
-    double fractionalDay = atof(excelTime);
-    int totalSeconds = static_cast<int>(fractionalDay * 86400);  // Total seconds in a day
-    int hours = totalSeconds / 3600;
-    int minutes = (totalSeconds % 3600) / 60;
-    int seconds = totalSeconds % 60;
-
-    ostringstream oss;
-    oss << setfill('0') << setw(2) << hours << ":"
-        << setfill('0') << setw(2) << minutes << ":"
-        << setfill('0') << setw(2) << seconds;
-    return oss.str();
+    */
 }
 
 void BookWindow::showError(const QSqlError &err)
