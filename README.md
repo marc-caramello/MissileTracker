@@ -2,8 +2,8 @@
 
 ## Here is a list of everything that this program does, in order
 
-1. Sets up the "temp" folder. If the "temp" folder:
-       • Exists, then delete everything inside of it
+1. Sets up the "temp" folder. If the "temp" folder:\
+       • Exists, then delete everything inside of it\
        • DOES NOT exist, then create an empty "temp" folder
 
 2. Downloads this excel file into the "temp" folder
