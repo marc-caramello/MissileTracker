@@ -70,10 +70,8 @@ private:
     string convertTime(const char* excelTime);
     void createTable_and_displayIt();
 
-    Ui::BookWindow ui;
     QSqlRelationalTableModel *model = nullptr;
     int authorIdx = 0, genreIdx = 0;
-    void createMenuBar();
 };
 
 #endif
