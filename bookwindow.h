@@ -12,6 +12,7 @@
 #include <ctime>
 #include <cwchar>
 #include <iomanip>
+#include <iostream>
 #include <shlwapi.h>
 #include <sstream>
 #include <string>
@@ -20,6 +21,7 @@
 #include <windows.h>
 #include <xlsxio_read.h>
 
+#include "row.h"
 #include "ui_bookwindow.h"
 
 #pragma comment(lib, "urlmon.lib")
@@ -36,22 +38,17 @@ private slots:
     void about();
 
 private:
-    vector<string> date;
-    vector<string> timeInUtc;
-    vector<string> startingLocation_city;
-    vector<string> startingLocation_latitude;
-    vector<string> startingLocation_longitude;
-    vector<string> landingLocation;
-    vector<string> distanceTraveled;
+    vector<Row> entireTable;
 
     void downloadExcelFile_and_storeItsData();
-    wchar_t* getDestination();
+    wchar_t* pathToTempFolder();
     char* wideToNarrow(const wchar_t* wideStr);
     void storeExcelFileData(const char* destination);
     bool isLeapYear(const int year);
     int daysInMonth(const int year, const int month);
     string convertDate(const char* excelDate);
     string convertTime(const char* excelTime);
+    void createTable();
 
     void showError(const QSqlError &err);
     Ui::BookWindow ui;

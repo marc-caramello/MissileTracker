@@ -4,12 +4,15 @@
 #include "bookwindow.h"
 #include "bookdelegate.h"
 #include "initdb.h"
-
-#include <QtSql>
+#include "row.h"
 
 BookWindow::BookWindow()
 {
+    // What I added: start
     downloadExcelFile_and_storeItsData();
+    createTable();
+    // What I added: end
+
     ui.setupUi(this);
 
     if (!QSqlDatabase::drivers().contains("QSQLITE"))
@@ -97,13 +100,15 @@ BookWindow::BookWindow()
 void BookWindow::downloadExcelFile_and_storeItsData()
 {
     const wchar_t* url = L"https://www.nti.org/wp-content/uploads/2021/10/north_korea_missile_test_database.xlsx";
-    const wchar_t* pathToExcelFile = getDestination();
 
-    URLDownloadToFile(NULL, url, pathToExcelFile, 0, NULL);
-    storeExcelFileData(wideToNarrow(pathToExcelFile));
+    std::wstring pathToExcelFile = pathToTempFolder();
+    pathToExcelFile += L"\\input.xlsx";
+
+    URLDownloadToFile(NULL, url, pathToExcelFile.c_str(), 0, NULL);
+    storeExcelFileData(wideToNarrow(pathToExcelFile.c_str()));
 }
 
-wchar_t* BookWindow::getDestination() {
+wchar_t* BookWindow::pathToTempFolder() {
     // Get the size of the buffer needed for the current working directory
     DWORD buffer_size = GetCurrentDirectory(0, nullptr);
 
@@ -116,9 +121,8 @@ wchar_t* BookWindow::getDestination() {
     // Go back 1 folder
     PathRemoveFileSpec(destination);
 
-    // Append "\\temp\\excel.xlsx"
+    // Append "\\temp"
     PathAppend(destination, L"temp");
-    PathAppend(destination, L"excel.xlsx");
 
     return destination;
 }
@@ -160,30 +164,55 @@ void BookWindow::storeExcelFileData(const char* pathToExcelFile)
 
     while (xlsxioread_sheet_next_row(sheet)) {
         if (current_rowNum >= 148) {
+            string date;
+            string timeInUtc;
+            string startingLocation_city;
+            string startingLocation_latitude;
+            string startingLocation_longitude;
+            string landingLocation;
+            string distanceTraveled_km;
+
             for (char current_columnLetter = 'A'; current_columnLetter <= 'O'; current_columnLetter++) {
                 cellVal = xlsxioread_sheet_next_cell(sheet);
 
                 if (current_columnLetter == 'B') {
-                    date.push_back(convertDate(cellVal));
+                    date = convertDate(cellVal);
                 }
                 else if (current_columnLetter == 'D') {
-                    timeInUtc.push_back(convertTime(cellVal));
+                    timeInUtc = convertTime(cellVal);
                 }
                 else if (current_columnLetter == 'I') {
-                    startingLocation_city.push_back(cellVal);
+                    startingLocation_city = cellVal;
+                    startingLocation_city.erase(std::remove(startingLocation_city.begin(), startingLocation_city.end(), '\''), startingLocation_city.end());
                 }
                 else if (current_columnLetter == 'K') {
-                    startingLocation_latitude.push_back(cellVal);
+                    startingLocation_latitude = cellVal;
                 }
                 else if (current_columnLetter == 'L') {
-                    startingLocation_longitude.push_back(cellVal);
+                    startingLocation_longitude = cellVal;
                 }
                 else if (current_columnLetter == 'M') {
-                    landingLocation.push_back(cellVal);
+                    landingLocation = cellVal;
                 }
                 else if (current_columnLetter == 'O') {
-                    distanceTraveled.push_back(cellVal);
+                    distanceTraveled_km = cellVal;
                 }
+            }
+            if(date != "Unknown" &&
+                timeInUtc != "Unknown" &&
+                startingLocation_city != "Unknown" &&
+                startingLocation_latitude != "Unknown" &&
+                startingLocation_longitude != "Unknown" &&
+                landingLocation != "Unknown" &&
+                distanceTraveled_km != "Unknown") {
+
+                Row row;
+                row.dateAndTime_inUtc = date + " " + timeInUtc;
+                row.startingLocation_city = startingLocation_city;
+                row.startingLocation_coordinates = startingLocation_latitude.substr(0, 5) + ", " + startingLocation_longitude.substr(0, 6);
+                row.landingLocation = landingLocation;
+                row.distanceTraveled_km = distanceTraveled_km.erase(distanceTraveled_km.length() - 3);;
+                entireTable.push_back(row);
             }
         }
         current_rowNum++;
@@ -197,7 +226,7 @@ bool BookWindow::isLeapYear(const int year) {
 }
 
 int BookWindow::daysInMonth(const int year, const int month) {
-    std::vector<int> monthLengths = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    vector<int> monthLengths = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     if (month == 2 && isLeapYear(year)) {
         return 29;
     }
@@ -205,7 +234,7 @@ int BookWindow::daysInMonth(const int year, const int month) {
 }
 
 string BookWindow::convertDate(const char* excelDate) {
-    int days = std::stoi(excelDate);
+    int days = stoi(excelDate);
     int year = 1900;
     int month = 1;
 
@@ -227,7 +256,7 @@ string BookWindow::convertDate(const char* excelDate) {
     }
     char buffer[11];
     snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d", year, month, days);
-    return std::string(buffer);
+    return string(buffer);
 }
 
 string BookWindow::convertTime(const char* excelTime) {
@@ -242,6 +271,32 @@ string BookWindow::convertTime(const char* excelTime) {
         << setfill('0') << setw(2) << minutes << ":"
         << setfill('0') << setw(2) << seconds;
     return oss.str();
+}
+
+void BookWindow::createTable() {
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    QString outputFilePath = QString::fromWCharArray(pathToTempFolder()) + "\\output.db";
+    db.setDatabaseName(outputFilePath);
+    db.open();
+    QSqlQuery query;
+
+    query.exec(R"(
+        CREATE TABLE MissileLaunches (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            dateAndTime_inUtc DATETIME,
+            startingLocation_city VARCHAR,
+            startingLocation_coordinates VARCHAR,
+            landingLocation VARCHAR,
+            distanceTraveled_km INTEGER
+        );
+    )");
+    for(const Row& row : entireTable) {
+        string str = "INSERT INTO MissileLaunches (dateAndTime_inUtc, startingLocation_city, startingLocation_coordinates, landingLocation, distanceTraveled_km) "
+                     "VALUES('" + row.dateAndTime_inUtc + "', '" + row.startingLocation_city + "', '" + row.startingLocation_coordinates + "', '" + row.landingLocation + "', '" + row.distanceTraveled_km + "')";
+        QString qStr = QString::fromStdString(str);
+        query.exec(qStr);
+    }
+    db.close();
 }
 
 void BookWindow::showError(const QSqlError &err)

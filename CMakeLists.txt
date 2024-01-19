@@ -24,6 +24,8 @@ qt_add_executable(books
     bookwindow.ui
     initdb.h
     main.cpp
+    row.h
+    row.cpp
 )
 target_link_libraries(books PRIVATE
     Qt6::Core
