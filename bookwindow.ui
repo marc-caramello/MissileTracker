@@ -79,6 +79,9 @@
             <property name="enabled">
              <bool>true</bool>
             </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item row="1" column="0">
@@ -121,6 +124,9 @@
             <property name="enabled">
              <bool>true</bool>
             </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
             <property name="prefix">
              <string/>
             </property>
@@ -141,6 +147,9 @@
           </item>
           <item row="4" column="1">
            <widget class="QSpinBox" name="ratingEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
             <property name="maximum">
              <number>5</number>
             </property>

@@ -10,17 +10,11 @@ BookWindow::BookWindow()
 {
     // What I added: start
     downloadExcelFile_and_storeItsData();
-    createTable();
+    createTable_and_displayIt();
     // What I added: end
 
+    /*
     ui.setupUi(this);
-
-    if (!QSqlDatabase::drivers().contains("QSQLITE"))
-        QMessageBox::critical(
-                    this,
-                    "Unable to load database",
-                    "This demo needs the SQLITE driver"
-                    );
 
     // Initialize the database:
     QSqlError err = initDb();
@@ -94,6 +88,7 @@ BookWindow::BookWindow()
 
     ui.bookTable->setCurrentIndex(model->index(0, 0));
     ui.bookTable->selectRow(0);
+    */
     createMenuBar();
 }
 
@@ -273,7 +268,7 @@ string BookWindow::convertTime(const char* excelTime) {
     return oss.str();
 }
 
-void BookWindow::createTable() {
+void BookWindow::createTable_and_displayIt() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     QString outputFilePath = QString::fromWCharArray(pathToTempFolder()) + "\\output.db";
     db.setDatabaseName(outputFilePath);
@@ -296,13 +291,19 @@ void BookWindow::createTable() {
         QString qStr = QString::fromStdString(str);
         query.exec(qStr);
     }
-    db.close();
-}
+    query.exec("SELECT * FROM MissileLaunches ORDER BY distanceTraveled_km DESC;");
 
-void BookWindow::showError(const QSqlError &err)
-{
-    QMessageBox::critical(this, "Unable to initialize Database",
-                "Error initializing database: " + err.text());
+    QSqlTableModel* model = new QSqlTableModel(this);
+    model->setTable("MissileLaunches");
+    model->select();
+
+    QTableView* view = new QTableView;
+    view->setModel(model);
+    view->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    setCentralWidget(view); // Set the table view as the central widget
+    view->show();
 }
 
 void BookWindow::createMenuBar()

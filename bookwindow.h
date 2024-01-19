@@ -48,9 +48,8 @@ private:
     int daysInMonth(const int year, const int month);
     string convertDate(const char* excelDate);
     string convertTime(const char* excelTime);
-    void createTable();
+    void createTable_and_displayIt();
 
-    void showError(const QSqlError &err);
     Ui::BookWindow ui;
     QSqlRelationalTableModel *model = nullptr;
     int authorIdx = 0, genreIdx = 0;
