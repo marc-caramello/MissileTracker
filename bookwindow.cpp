@@ -96,7 +96,7 @@ void BookWindow::downloadExcelFile_and_storeItsData()
 {
     const wchar_t* url = L"https://www.nti.org/wp-content/uploads/2021/10/north_korea_missile_test_database.xlsx";
 
-    std::wstring pathToExcelFile = pathToTempFolder();
+    wstring pathToExcelFile = pathToTempFolder();
     pathToExcelFile += L"\\input.xlsx";
 
     URLDownloadToFile(NULL, url, pathToExcelFile.c_str(), 0, NULL);
@@ -178,7 +178,7 @@ void BookWindow::storeExcelFileData(const char* pathToExcelFile)
                 }
                 else if (current_columnLetter == 'I') {
                     startingLocation_city = cellVal;
-                    startingLocation_city.erase(std::remove(startingLocation_city.begin(), startingLocation_city.end(), '\''), startingLocation_city.end());
+                    startingLocation_city.erase(remove(startingLocation_city.begin(), startingLocation_city.end(), '\''), startingLocation_city.end());
                 }
                 else if (current_columnLetter == 'K') {
                     startingLocation_latitude = cellVal;
@@ -277,7 +277,6 @@ void BookWindow::createTable_and_displayIt() {
 
     query.exec(R"(
         CREATE TABLE MissileLaunches (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
             dateAndTime_inUtc DATETIME,
             startingLocation_city VARCHAR,
             startingLocation_coordinates VARCHAR,
@@ -299,11 +298,19 @@ void BookWindow::createTable_and_displayIt() {
 
     QTableView* view = new QTableView;
     view->setModel(model);
-    view->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    setCentralWidget(view); // Set the table view as the central widget
-    view->show();
+    view->setColumnWidth(0, 150);
+    view->setColumnWidth(1, 300);
+    view->setColumnWidth(2, 175);
+    view->setColumnWidth(3, 150);
+    view->setColumnWidth(4, 125);
+
+    for (int column = 0; column < model->columnCount(); ++column) {
+        view->setItemDelegateForColumn(column, new MyCustomDelegate(view));
+    }
+    QMainWindow* mainWindow = new QMainWindow;
+    mainWindow->setCentralWidget(view);
+    mainWindow->showMaximized();
 }
 
 void BookWindow::createMenuBar()

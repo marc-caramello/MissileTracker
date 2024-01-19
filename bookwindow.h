@@ -20,6 +20,7 @@
 #include <vector>
 #include <windows.h>
 #include <xlsxio_read.h>
+#include <QStyledItemDelegate>
 
 #include "row.h"
 #include "ui_bookwindow.h"
@@ -27,6 +28,25 @@
 #pragma comment(lib, "urlmon.lib")
 
 using namespace std;
+
+class MyCustomDelegate : public QStyledItemDelegate {
+public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        QStyleOptionViewItem centeredOption(option);
+        centeredOption.displayAlignment = Qt::AlignCenter;
+        QStyledItemDelegate::paint(painter, centeredOption, index);
+    }
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override
+    {
+        // Disable editing by returning nullptr
+        Q_UNUSED(parent)
+        Q_UNUSED(option)
+        Q_UNUSED(index)
+        return nullptr;
+    }
+};
 
 class BookWindow: public QMainWindow
 {
