@@ -188,11 +188,8 @@ void Window::createTable_and_displayIt() {
         QString qStr = QString::fromStdString(str);
         query.exec(qStr);
     }
-    query.exec("SELECT * FROM MissileLaunches ORDER BY distanceTraveled_km DESC;");
-
-    QSqlTableModel* model = new QSqlTableModel(this);
-    model->setTable("MissileLaunches");
-    model->select();
+    QSqlQueryModel* model = new QSqlQueryModel(this);
+    model->setQuery("SELECT * FROM MissileLaunches ORDER BY distanceTraveled_km DESC;");
 
     QTableView* view = new QTableView;
     view->setModel(model);
