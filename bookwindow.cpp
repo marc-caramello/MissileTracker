@@ -11,12 +11,12 @@ Window::Window()
 
 void Window::setUp_temp_folder()
 {
-    string path = "C:\\Users\\marcc\\OneDrive\\Desktop\\CodingProjects\\Qt\\books\\temp";
+    char* pathTo_temp_folder = wideToNarrow(pathToTempFolder());
 
-    if (filesystem::exists(path) && filesystem::is_directory(path)) {
-        filesystem::remove_all(path);
+    if (filesystem::exists(pathTo_temp_folder) && filesystem::is_directory(pathTo_temp_folder)) {
+        filesystem::remove_all(pathTo_temp_folder);
     }
-    filesystem::create_directory(path);
+    filesystem::create_directory(pathTo_temp_folder);
 }
 
 void Window::downloadExcelFile_and_storeItsData()
