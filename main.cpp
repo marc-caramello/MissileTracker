@@ -1,4 +1,3 @@
-#include <QtWidgets>
 #include "bookwindow.h"
 
 int main(int argc, char * argv[])

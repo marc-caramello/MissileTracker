@@ -1,24 +1,10 @@
 #ifndef BOOKWINDOW_H
 #define BOOKWINDOW_H
 
-#include <chrono>
-#include <cstdlib>
-#include <ctime>
-#include <cwchar>
-#include <iomanip>
-#include <iostream>
 #include <shlwapi.h>
-#include <sstream>
-#include <string>
-#include <urlmon.h>
-#include <vector>
-#include <windows.h>
 #include <xlsxio_read.h>
-
-#include <QStyledItemDelegate>
 #include <QtSql>
-#include <QtWidgets>
-
+#include "mycustomdelegate.h"
 #include "row.h"
 #include "ui_bookwindow.h"
 
@@ -34,16 +20,22 @@ public:
 private:
     vector<Row> entireTable;
 
-    void setUp_temp_folder();
-    void downloadExcelFile_and_storeItsData();
+    // Put in helper class
     wchar_t* pathToTempFolder();
     char* wideToNarrow(const wchar_t* wideStr);
+
+    // Put in separate class
+    void setUp_temp_folder();
+
+    // Put in separate class
+    void downloadExcelFile_and_storeItsData();
     void storeExcelFileData(const char* destination);
     bool isLeapYear(const int year);
     int daysInMonth(const int year, const int month);
     string convertDate(const char* excelDate);
     string convertTime(const char* excelTime);
 
+    // Put in separate class
     void createTable_and_displayIt();
 };
 

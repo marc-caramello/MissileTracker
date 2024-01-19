@@ -1,6 +1,4 @@
 #include "bookwindow.h"
-#include "mycustomdelegate.h"
-#include "row.h"
 
 Window::Window()
 {
@@ -31,48 +29,21 @@ void Window::downloadExcelFile_and_storeItsData()
 }
 
 wchar_t* Window::pathToTempFolder() {
-    // Get the size of the buffer needed for the current working directory
     DWORD buffer_size = GetCurrentDirectory(0, nullptr);
+    wchar_t* pathTo_temp_folder = new wchar_t[buffer_size];
+    GetCurrentDirectory(buffer_size, pathTo_temp_folder);
 
-    // Allocate a buffer to store the current working directory
-    wchar_t* destination = new wchar_t[buffer_size];
-
-    // Get the current working directory and store it in the buffer
-    GetCurrentDirectory(buffer_size, destination);
-
-    // Go back 1 folder
-    PathRemoveFileSpec(destination);
-
-    // Append "\\temp"
-    PathAppend(destination, L"temp");
-
-    return destination;
+    // Go back 1 folder (right now it is in the "build" folder), append "\\temp", then return its value
+    PathRemoveFileSpec(pathTo_temp_folder);
+    PathAppend(pathTo_temp_folder, L"temp");
+    return pathTo_temp_folder;
 }
 
 char* Window::wideToNarrow(const wchar_t* wideStr) {
-    // Calculate the required size for the narrow string
     size_t size = wcstombs(nullptr, wideStr, 0);
-
-    if (size == static_cast<size_t>(-1)) {
-        // Conversion failed, handle the error as needed
-        return nullptr;
-    }
-
-    // Allocate memory for the narrow string
     char* narrowStr = new char[size + 1];
-
-    // Convert wide string to narrow string
-    size_t result = wcstombs(narrowStr, wideStr, size);
-
-    if (result == static_cast<size_t>(-1)) {
-        // Conversion failed, handle the error as needed
-        delete[] narrowStr;
-        return nullptr;
-    }
-
-    // Null-terminate the narrow string
+    wcstombs(narrowStr, wideStr, size);
     narrowStr[size] = '\0';
-
     return narrowStr;
 }
 
