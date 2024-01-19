@@ -1,14 +1,22 @@
-// Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
-
 #include "bookwindow.h"
 #include "mycustomdelegate.h"
 #include "row.h"
 
 Window::Window()
 {
+    setUp_temp_folder();
     downloadExcelFile_and_storeItsData();
     createTable_and_displayIt();
+}
+
+void Window::setUp_temp_folder()
+{
+    string path = "C:\\Users\\marcc\\OneDrive\\Desktop\\CodingProjects\\Qt\\books\\temp";
+
+    if (filesystem::exists(path) && filesystem::is_directory(path)) {
+        filesystem::remove_all(path);
+    }
+    filesystem::create_directory(path);
 }
 
 void Window::downloadExcelFile_and_storeItsData()

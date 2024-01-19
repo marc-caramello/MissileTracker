@@ -16,4 +16,4 @@ public:
     }
 };
 
-#endif // MYCUSTOMDELEGATE_H
+#endif

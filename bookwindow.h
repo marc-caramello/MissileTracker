@@ -1,11 +1,5 @@
-// Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
-
 #ifndef BOOKWINDOW_H
 #define BOOKWINDOW_H
-
-#include <QtWidgets>
-#include <QtSql>
 
 #include <chrono>
 #include <cstdlib>
@@ -20,7 +14,10 @@
 #include <vector>
 #include <windows.h>
 #include <xlsxio_read.h>
+
 #include <QStyledItemDelegate>
+#include <QtSql>
+#include <QtWidgets>
 
 #include "row.h"
 #include "ui_bookwindow.h"
@@ -37,6 +34,7 @@ public:
 private:
     vector<Row> entireTable;
 
+    void setUp_temp_folder();
     void downloadExcelFile_and_storeItsData();
     wchar_t* pathToTempFolder();
     char* wideToNarrow(const wchar_t* wideStr);

@@ -16,4 +16,4 @@ public:
     Row() = default;
 };
 
-#endif // ROW_H
+#endif
