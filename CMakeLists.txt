@@ -17,15 +17,12 @@ find_package(Qt6 REQUIRED COMPONENTS
 qt_standard_project_setup()
 
 qt_add_executable(books
-    bookdelegate.cpp
-    bookdelegate.h
     bookwindow.cpp
     bookwindow.h
     bookwindow.ui
-    initdb.h
     main.cpp
     row.h
-    row.cpp
+    mycustomdelegate.h
 )
 target_link_libraries(books PRIVATE
     Qt6::Core

@@ -29,34 +29,11 @@
 
 using namespace std;
 
-class MyCustomDelegate : public QStyledItemDelegate {
-public:
-    using QStyledItemDelegate::QStyledItemDelegate;
-
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
-        QStyleOptionViewItem centeredOption(option);
-        centeredOption.displayAlignment = Qt::AlignCenter;
-        QStyledItemDelegate::paint(painter, centeredOption, index);
-    }
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override
-    {
-        // Disable editing by returning nullptr
-        Q_UNUSED(parent)
-        Q_UNUSED(option)
-        Q_UNUSED(index)
-        return nullptr;
-    }
-};
-
-class BookWindow: public QMainWindow
+class Window : public QMainWindow
 {
     Q_OBJECT
 public:
-    BookWindow();
-
-private slots:
-    void about();
-
+    Window();
 private:
     vector<Row> entireTable;
 
@@ -69,9 +46,6 @@ private:
     string convertDate(const char* excelDate);
     string convertTime(const char* excelTime);
     void createTable_and_displayIt();
-
-    QSqlRelationalTableModel *model = nullptr;
-    int authorIdx = 0, genreIdx = 0;
 };
 
 #endif

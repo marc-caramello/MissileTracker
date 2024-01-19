@@ -2,17 +2,16 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
 #include "bookwindow.h"
-#include "bookdelegate.h"
-#include "initdb.h"
+#include "mycustomdelegate.h"
 #include "row.h"
 
-BookWindow::BookWindow()
+Window::Window()
 {
     downloadExcelFile_and_storeItsData();
     createTable_and_displayIt();
 }
 
-void BookWindow::downloadExcelFile_and_storeItsData()
+void Window::downloadExcelFile_and_storeItsData()
 {
     const wchar_t* url = L"https://www.nti.org/wp-content/uploads/2021/10/north_korea_missile_test_database.xlsx";
 
@@ -23,7 +22,7 @@ void BookWindow::downloadExcelFile_and_storeItsData()
     storeExcelFileData(wideToNarrow(pathToExcelFile.c_str()));
 }
 
-wchar_t* BookWindow::pathToTempFolder() {
+wchar_t* Window::pathToTempFolder() {
     // Get the size of the buffer needed for the current working directory
     DWORD buffer_size = GetCurrentDirectory(0, nullptr);
 
@@ -42,7 +41,7 @@ wchar_t* BookWindow::pathToTempFolder() {
     return destination;
 }
 
-char* BookWindow::wideToNarrow(const wchar_t* wideStr) {
+char* Window::wideToNarrow(const wchar_t* wideStr) {
     // Calculate the required size for the narrow string
     size_t size = wcstombs(nullptr, wideStr, 0);
 
@@ -69,7 +68,7 @@ char* BookWindow::wideToNarrow(const wchar_t* wideStr) {
     return narrowStr;
 }
 
-void BookWindow::storeExcelFileData(const char* pathToExcelFile)
+void Window::storeExcelFileData(const char* pathToExcelFile)
 {
     xlsxioreader xlsxioread = xlsxioread_open(pathToExcelFile);
     xlsxioreadersheet sheet = xlsxioread_sheet_open(xlsxioread, NULL, XLSXIOREAD_SKIP_EMPTY_ROWS);
@@ -136,11 +135,11 @@ void BookWindow::storeExcelFileData(const char* pathToExcelFile)
     xlsxioread_close(xlsxioread);
 }
 
-bool BookWindow::isLeapYear(const int year) {
+bool Window::isLeapYear(const int year) {
     return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
 }
 
-int BookWindow::daysInMonth(const int year, const int month) {
+int Window::daysInMonth(const int year, const int month) {
     vector<int> monthLengths = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     if (month == 2 && isLeapYear(year)) {
         return 29;
@@ -148,7 +147,7 @@ int BookWindow::daysInMonth(const int year, const int month) {
     return monthLengths[month - 1];
 }
 
-string BookWindow::convertDate(const char* excelDate) {
+string Window::convertDate(const char* excelDate) {
     int days = stoi(excelDate);
     int year = 1900;
     int month = 1;
@@ -174,7 +173,7 @@ string BookWindow::convertDate(const char* excelDate) {
     return string(buffer);
 }
 
-string BookWindow::convertTime(const char* excelTime) {
+string Window::convertTime(const char* excelTime) {
     double fractionalDay = atof(excelTime);
     int totalSeconds = static_cast<int>(fractionalDay * 86400);  // Total seconds in a day
     int hours = totalSeconds / 3600;
@@ -188,7 +187,7 @@ string BookWindow::convertTime(const char* excelTime) {
     return oss.str();
 }
 
-void BookWindow::createTable_and_displayIt() {
+void Window::createTable_and_displayIt() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     QString outputFilePath = QString::fromWCharArray(pathToTempFolder()) + "\\output.db";
     db.setDatabaseName(outputFilePath);
@@ -230,11 +229,4 @@ void BookWindow::createTable_and_displayIt() {
     }
     this->setCentralWidget(view);
     this->showMaximized();
-}
-
-void BookWindow::about()
-{
-    QMessageBox::about(this, tr("About Books"),
-            tr("<p>The <b>Books</b> example shows how to use Qt SQL classes "
-               "with a model/view framework."));
 }
