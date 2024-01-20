@@ -23,3 +23,5 @@
 
 6. Displays the entire table\
        • Below is what is looks like
+
+![readmeImage](readmeImage.png)  
